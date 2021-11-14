@@ -4,7 +4,7 @@ declare (strict_types=1);
 namespace ffhome\frame\middleware;
 
 use \Closure;
-use \ffhome\frame\traits\JumpTrait;
+use ffhome\frame\traits\JumpTrait;
 use ffhome\frame\service\AuthService;
 use think\Request;
 

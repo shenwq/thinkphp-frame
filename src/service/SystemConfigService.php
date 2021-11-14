@@ -3,8 +3,8 @@ declare (strict_types=1);
 
 namespace ffhome\frame\service;
 
-use \think\facade\Cache;
-use \think\facade\Db;
+use think\facade\Cache;
+use think\facade\Db;
 
 /**
  * 系统配置相关处理

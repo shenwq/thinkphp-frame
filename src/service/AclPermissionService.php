@@ -5,8 +5,8 @@ namespace ffhome\frame\service;
 
 use ffhome\common\util\CommonUtil;
 use ffhome\frame\model\BaseModel;
-use \think\facade\Cache;
-use \think\facade\Db;
+use think\facade\Cache;
+use think\facade\Db;
 
 /**
  * 权限相关处理
