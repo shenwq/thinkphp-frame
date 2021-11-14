@@ -27,7 +27,7 @@ class AclPermissionService
             $data = Db::name(self::NAME)->field('title,icon,href')
                 ->where('catalog', self::C_HOME)
                 ->where('status', BaseModel::ENABLE)
-                ->find()->toArray();
+                ->find();
             Cache::tag(self::NAME)->set('home_info', $data);
         }
         return $data;

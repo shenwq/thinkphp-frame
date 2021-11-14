@@ -18,7 +18,7 @@ class AuthService
 
     /**
      * 当前用户ID
-     * @return int
+     * @return string
      */
     public function currentUserId()
     {
@@ -28,12 +28,13 @@ class AuthService
             if (!empty($token)) {
                 $userId = JwtAuth::verifyToken($token, (new SystemConfigService())->value('token_key'));
                 if (!empty($userId)) {
+                    $userId = $userId['id'];
                     $user = $this->getUserById($userId);
                     session(config('app.sess_user'), $user);
                 }
             }
             if (empty($userId)) {
-                $userId = 0;
+                $userId = '0';
             }
         }
         return $userId;
@@ -44,7 +45,7 @@ class AuthService
         return Db::name('acl_user')->alias('u');
     }
 
-    public function getUserByUserName($username)
+    public function getUserByUserName(string $username)
     {
         return $this->getUserDb()
             ->field($this->sessionField . ',u.password,u.login_num')
@@ -53,7 +54,7 @@ class AuthService
             ->find();
     }
 
-    private function getUserById($id)
+    private function getUserById(string $id)
     {
         return $this->getUserDb()
             ->field($this->sessionField)
@@ -75,14 +76,14 @@ class AuthService
      * 权限判断
      * @return bool
      */
-    public function check($node)
+    public function check(string $node)
     {
         $userId = $this->currentUserId();
         $perms = $this->getPermsByUserId($userId);
         return in_array($node, $perms);
     }
 
-    private function getPermsByUserId($userId)
+    private function getPermsByUserId(string $userId)
     {
         if (empty($userId)) {
             return [];
