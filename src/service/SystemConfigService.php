@@ -37,7 +37,7 @@ class SystemConfigService
     }
 
     /**
-     * 获取知道配置信息的值
+     * 获取系统配置信息的值
      * @param string $name
      * @return string
      */

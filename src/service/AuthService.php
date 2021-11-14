@@ -18,7 +18,7 @@ class AuthService
 
     /**
      * 当前用户ID
-     * @return string
+     * @return int
      */
     public function currentUserId()
     {
@@ -54,7 +54,7 @@ class AuthService
             ->find();
     }
 
-    private function getUserById(string $id)
+    private function getUserById(int $id)
     {
         return $this->getUserDb()
             ->field($this->sessionField)
@@ -83,7 +83,7 @@ class AuthService
         return in_array($node, $perms);
     }
 
-    private function getPermsByUserId(string $userId)
+    private function getPermsByUserId(int $userId)
     {
         if (empty($userId)) {
             return [];
