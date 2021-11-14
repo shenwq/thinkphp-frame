@@ -26,7 +26,7 @@ class AuthService extends Singleton
         if (empty($userId)) {
             $token = cookie('token');
             if (!empty($token)) {
-                $userId = JwtAuth::verifyToken($token, SystemConfigService::instance()->value('token_key'));
+                $userId = JwtAuth::verifyToken($token, (new SystemConfigService())->value('token_key'));
                 if (!empty($userId)) {
                     $user = $this->getUserById($userId);
                     session(config('app.sess_user'), $user);
@@ -113,15 +113,17 @@ class AuthService extends Singleton
         $userId = $this->currentUserId();
         $data = Cache::get('auth_init_' . $userId);
         if (empty($data)) {
+            $config = new SystemConfigService();
+            $permission = new AclPermissionService();
             $data = [
                 'logoInfo' => [
-                    'title' => SystemConfigService::instance()->value('logo_title'),
-                    'image' => SystemConfigService::instance()->value('logo_image'),
+                    'title' => $config->value('logo_title'),
+                    'image' => $config->value('logo_image'),
                     'href' => url('index/index')->build(),
                 ],
-                'homeInfo' => AclPermissionService::instance()->getHomeInfo(),
-                'menuInfo' => AclPermissionService::instance()->getMenuTree($userId),
-                'typeList' => DictDataService::instance()->getAll(),
+                'homeInfo' => $permission->getHomeInfo(),
+                'menuInfo' => $permission->getMenuTree($userId),
+                'typeList' => (new DictDataService())->getAll(),
             ];
             Cache::tag(self::NAME)->set('auth_init_' . $userId, $data);
         }
