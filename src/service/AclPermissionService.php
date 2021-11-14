@@ -42,6 +42,7 @@ class AclPermissionService
             ->join('acl_role_permission rp', 'rp.permission_id=p.id')
             ->join('acl_role r', 'r.id=rp.role_id')
             ->join('acl_user_role ur', 'ur.role_id=r.id')
+            ->field('p.id, p.pid, p.title, p.href, p.target, p.icon')
             ->where([
                 'ur.user_id' => $userId,
                 'r.status' => BaseModel::ENABLE,
