@@ -10,8 +10,6 @@ use think\Request;
 
 /**
  * 检测用户登录和节点权限
- * Class CheckAdmin
- * @package app\admin\middleware
  */
 class CheckAuth
 {
