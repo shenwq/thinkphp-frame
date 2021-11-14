@@ -11,7 +11,7 @@ use \think\facade\Db;
 /**
  * 权限相关处理
  */
-class AclPermissionService extends Singleton
+class AclPermissionService
 {
     const C_MENU = 1;
     const C_HOME = 3;

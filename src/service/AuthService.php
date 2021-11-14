@@ -11,7 +11,7 @@ use think\facade\Db;
 /**
  * 权限验证服务
  */
-class AuthService extends Singleton
+class AuthService
 {
     const NAME = 'authority';
     private $sessionField = 'u.id,u.username,u.nick_name,u.avatar';

@@ -9,7 +9,7 @@ use \think\facade\Db;
 /**
  * 数据字典相关处理
  */
-class DictDataService extends Singleton
+class DictDataService
 {
     const NAME = 'dict_data';
 

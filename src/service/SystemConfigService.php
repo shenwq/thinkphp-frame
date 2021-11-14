@@ -9,7 +9,7 @@ use \think\facade\Db;
 /**
  * 系统配置相关处理
  */
-class SystemConfigService extends Singleton
+class SystemConfigService
 {
     const NAME = 'system_config';
 
