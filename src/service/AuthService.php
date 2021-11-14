@@ -1,0 +1,130 @@
+<?php
+declare (strict_types=1);
+
+namespace ffhome\frame\service;
+
+use ffhome\frame\model\BaseModel;
+use ffhome\util\JwtAuth;
+use think\facade\Cache;
+use think\facade\Db;
+
+/**
+ * 权限验证服务
+ */
+class AuthService extends Singleton
+{
+    const NAME = 'authority';
+    private $sessionField = 'u.id,u.username,u.nick_name,u.avatar';
+
+    /**
+     * 当前用户ID
+     * @return int
+     */
+    public function currentUserId()
+    {
+        $userId = session(config('app.sess_user') . '.id');
+        if (empty($userId)) {
+            $token = cookie('token');
+            if (!empty($token)) {
+                $userId = JwtAuth::verifyToken($token, SystemConfigService::instance()->value('token_key'));
+                if (!empty($userId)) {
+                    $user = $this->getUserById($userId);
+                    session(config('app.sess_user'), $user);
+                }
+            }
+            if (empty($userId)) {
+                $userId = 0;
+            }
+        }
+        return $userId;
+    }
+
+    private function getUserDb()
+    {
+        return Db::name('acl_user')->alias('u');
+    }
+
+    public function getUserByUserName($username)
+    {
+        return $this->getUserDb()
+            ->field($this->sessionField . ',u.password,u.login_num')
+            ->where(['u.username' => $username, 'u.status' => BaseModel::ENABLE])
+            ->whereNull('u.delete_time')
+            ->find();
+    }
+
+    private function getUserById($id)
+    {
+        return $this->getUserDb()
+            ->field($this->sessionField)
+            ->where(['u.id' => $id, 'u.status' => BaseModel::ENABLE])
+            ->whereNull('u.delete_time')
+            ->find();
+    }
+
+    /**
+     * 当前节点
+     * @return string
+     */
+    public function currentNode()
+    {
+        return request()->controller() . '/' . request()->action();
+    }
+
+    /**
+     * 权限判断
+     * @return bool
+     */
+    public function check($node)
+    {
+        $userId = $this->currentUserId();
+        $perms = $this->getPermsByUserId($userId);
+        return in_array($node, $perms);
+    }
+
+    private function getPermsByUserId($userId)
+    {
+        if (empty($userId)) {
+            return [];
+        }
+        $perms = Cache::get('auth_code_' . $userId);
+        if (empty($perms)) {
+            $perms = Db::name('acl_permission')->alias('p')
+                ->join('acl_role_permission rp', 'rp.permission_id=p.id')
+                ->join('acl_role r', 'r.id=rp.role_id')
+                ->join('acl_user_role ur', 'ur.role_id=r.id')
+                ->distinct(true)->field('p.perms')
+                ->where([
+                    ['ur.user_id', '=', $userId],
+                    ['r.status', '=', BaseModel::ENABLE],
+                    ['p.status', '=', BaseModel::ENABLE],
+                    ['p.perms', '<>', ''],
+                ])->column('p.perms');
+            //将权限分离并去重
+            $perms = array_unique(explode(',', implode(',', $perms)));
+            Cache::tag(self::NAME)->set('auth_code_' . $userId, $perms);
+        }
+        return $perms;
+    }
+
+    public function init()
+    {
+
+        $userId = $this->currentUserId();
+        $data = Cache::get('auth_init_' . $userId);
+        if (empty($data)) {
+            $data = [
+                'logoInfo' => [
+                    'title' => SystemConfigService::instance()->value('logo_title'),
+                    'image' => SystemConfigService::instance()->value('logo_image'),
+                    'href' => url('index/index')->build(),
+                ],
+                'homeInfo' => AclPermissionService::instance()->getHomeInfo(),
+                'menuInfo' => AclPermissionService::instance()->getMenuTree($userId),
+                'typeList' => DictDataService::instance()->getAll(),
+            ];
+            Cache::tag(self::NAME)->set('auth_init_' . $userId, $data);
+        }
+        return $data;
+    }
+}
