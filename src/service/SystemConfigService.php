@@ -41,7 +41,7 @@ class SystemConfigService
      * @param string $name
      * @return string
      */
-    public function value(string $name)
+    public function value(string $name): string
     {
         return $this->config('', $name);
     }

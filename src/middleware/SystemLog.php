@@ -3,6 +3,7 @@ declare (strict_types=1);
 
 namespace ffhome\frame\middleware;
 
+use Closure;
 use ffhome\common\util\CommonUtil;
 use ffhome\frame\service\AuthService;
 use ffhome\frame\service\SystemLogService;
@@ -22,7 +23,7 @@ class SystemLog
         'password_again',
     ];
 
-    public function handle(Request $request, \Closure $next)
+    public function handle(Request $request, Closure $next)
     {
         if ($request->isAjax()) {
             $method = strtolower($request->method());

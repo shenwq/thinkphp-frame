@@ -137,7 +137,7 @@ trait JumpTrait
      * @access protected
      * @return string
      */
-    protected function getResponseType()
+    protected function getResponseType(): string
     {
         return (request()->isJson() || request()->isAjax() || request()->isPost()) ? 'json' : 'html';
     }

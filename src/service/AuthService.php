@@ -5,6 +5,7 @@ namespace ffhome\frame\service;
 
 use ffhome\frame\model\BaseModel;
 use ffhome\util\JwtAuth;
+use think\db\BaseQuery;
 use think\facade\Cache;
 use think\facade\Db;
 
@@ -14,13 +15,13 @@ use think\facade\Db;
 class AuthService
 {
     const NAME = 'authority';
-    private $sessionField = 'u.id,u.username,u.nick_name,u.avatar';
+    protected $sessionField = 'u.id,u.username,u.nick_name,u.avatar';
 
     /**
      * 当前用户ID
      * @return int
      */
-    public function currentUserId()
+    public function currentUserId(): int
     {
         $userId = session(config('app.sess_user') . '.id');
         if (empty($userId)) {
@@ -30,6 +31,7 @@ class AuthService
                 if (!empty($userId)) {
                     $userId = $userId['id'];
                     $user = $this->getUserById($userId);
+                    $this->addInfoToSession($user);
                     session(config('app.sess_user'), $user);
                 }
             }
@@ -40,7 +42,11 @@ class AuthService
         return $userId;
     }
 
-    private function getUserDb()
+    public function addInfoToSession(array &$info)
+    {
+    }
+
+    private function getUserDb(): BaseQuery
     {
         return Db::name('acl_user')->alias('u');
     }
@@ -67,7 +73,7 @@ class AuthService
      * 当前节点
      * @return string
      */
-    public function currentNode()
+    public function currentNode(): string
     {
         return request()->controller() . '/' . request()->action();
     }
@@ -76,14 +82,14 @@ class AuthService
      * 权限判断
      * @return bool
      */
-    public function check(string $node)
+    public function check(string $node): bool
     {
         $userId = $this->currentUserId();
         $perms = $this->getPermsByUserId($userId);
         return in_array($node, $perms);
     }
 
-    private function getPermsByUserId(int $userId)
+    private function getPermsByUserId(int $userId): array
     {
         if (empty($userId)) {
             return [];
@@ -108,7 +114,7 @@ class AuthService
         return $perms;
     }
 
-    public function init()
+    public function init(): array
     {
 
         $userId = $this->currentUserId();
