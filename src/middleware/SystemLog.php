@@ -5,7 +5,6 @@ namespace ffhome\frame\middleware;
 
 use Closure;
 use ffhome\common\util\CommonUtil;
-use ffhome\frame\service\AuthService;
 use ffhome\frame\service\SystemLogService;
 use think\Request;
 
@@ -39,7 +38,7 @@ class SystemLog
                     in_array($key, $this->sensitiveParams) && $params[$key] = CommonUtil::password($val);
                 }
                 $data = [
-                    'user_id' => (new AuthService())->currentUserId(),
+                    'user_id' => app('authService')->currentUserId(),
                     'url' => $url,
                     'method' => $method,
                     'ip' => $ip,

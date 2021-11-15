@@ -5,7 +5,6 @@ namespace ffhome\frame\middleware;
 
 use Closure;
 use ffhome\frame\traits\JumpTrait;
-use ffhome\frame\service\AuthService;
 use think\Request;
 
 /**
@@ -18,7 +17,7 @@ class CheckAuth
     public function handle(Request $request, Closure $next)
     {
         $authConfig = config('auth');
-        $authService = new AuthService();
+        $authService = app('authService');
         $currentNode = $authService->currentNode();
         // 验证登录
         if (in_array($currentNode, $authConfig['no_login'])) {

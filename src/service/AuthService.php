@@ -11,6 +11,7 @@ use think\facade\Db;
 
 /**
  * 权限验证服务
+ * 在provider.php文件中增加'authService' => AuthService::class,配置
  */
 class AuthService
 {

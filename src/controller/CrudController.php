@@ -4,6 +4,7 @@ declare (strict_types=1);
 namespace ffhome\frame\controller;
 
 use jianyan\excel\Excel;
+use think\db\BaseQuery;
 use think\facade\Db;
 use think\helper\Str;
 
@@ -143,7 +144,7 @@ abstract class CrudController extends BaseController
      * @param array $param
      * @return array
      */
-    protected function buildWhere(array $param)
+    protected function buildWhere(array $param): array
     {
         $where = [];
         foreach ($param as $field => $value) {
@@ -201,7 +202,7 @@ abstract class CrudController extends BaseController
      * @param string $op
      * @return string
      */
-    protected function convertFieldName(string $field, string $op)
+    protected function convertFieldName(string $field, string $op): string
     {
         $pos = strpos($field, '_');
         if ($pos !== false) {
@@ -215,7 +216,7 @@ abstract class CrudController extends BaseController
      * 获取基本的查询模型，通常扩展次方法增加关联表处理
      * @return \think\db\BaseQuery
      */
-    protected function getBaseModel()
+    protected function getBaseModel(): BaseQuery
     {
         return Db::name($this->modelName)->alias($this->alias);
     }
@@ -224,7 +225,7 @@ abstract class CrudController extends BaseController
      * 获取查询模型
      * @return \think\db\BaseQuery
      */
-    protected function getSearchModel($where)
+    protected function getSearchModel($where): BaseQuery
     {
         $model = $this->getBaseModel();
         $model = $model->where($where);
@@ -234,12 +235,12 @@ abstract class CrudController extends BaseController
         return $model;
     }
 
-    protected function getSearchFields()
+    protected function getSearchFields(): string
     {
         return '*';
     }
 
-    protected function getSearchSort()
+    protected function getSearchSort(): array
     {
         $order = $this->request->get('order', '');
         if (empty($order)) {
@@ -253,7 +254,7 @@ abstract class CrudController extends BaseController
      * 列表默认排序方式，可重写定义排序方式
      * @return array
      */
-    protected function getSearchDefaultSort()
+    protected function getSearchDefaultSort(): array
     {
         return ['id' => 'desc'];
     }
