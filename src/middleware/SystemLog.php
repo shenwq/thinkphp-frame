@@ -13,7 +13,6 @@ use think\Request;
  */
 class SystemLog
 {
-
     /**
      * 敏感信息字段，日志记录时需要加密
      * @var array
