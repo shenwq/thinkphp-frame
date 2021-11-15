@@ -36,7 +36,7 @@ class AuthService
                 }
             }
             if (empty($userId)) {
-                $userId = '0';
+                $userId = 0;
             }
         }
         return $userId;
