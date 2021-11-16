@@ -281,7 +281,7 @@ abstract class CrudController extends BaseController
      */
     protected function getSearchDefaultSort(): array
     {
-        return ['id' => 'desc'];
+        return ["{$this->alias}.id" => 'desc'];
     }
 
     /**
@@ -463,12 +463,12 @@ abstract class CrudController extends BaseController
 
     /**
      * 获取模型数据
-     * @param $id
+     * @param int $id
      * @return array
      */
     protected function getModelInfo(int $id): array
     {
-        $row = $this->getSearchModel(['id' => $id])
+        $row = $this->getSearchModel(["{$this->alias}.id" => $id])
             ->field($this->getSearchFields())
             ->find();
         empty($row) && $this->error(lang('common.data_not_exist'));
@@ -548,6 +548,54 @@ abstract class CrudController extends BaseController
     protected function onAfterEdit(array &$data, array $row)
     {
         $this->clearCache();
+    }
+
+    /**
+     * 删除操作
+     * @param array|int $id 删除的主键
+     */
+    public function delete($id)
+    {
+        Db::transaction(function () use ($id) {
+            $row = $this->onBeforeDelete($id);
+            Db::name($this->modelName)->delete($id);
+            $this->onAfterDelete($id, $row);
+        });
+        $this->success(lang('common.delete_success'));
+    }
+
+    /**
+     * 删除操作前触发的事件
+     * @param array|int $id 删除的主键
+     * @return array 将要删除的数据库数据（可选）
+     */
+    protected function onBeforeDelete($id): array
+    {
+        return [];
+    }
+
+    /**
+     * 删除操作后触发的事件
+     * @param array|int $id 删除的主键
+     * @param array $row 将要删除的数据库数据（可选）
+     */
+    protected function onAfterDelete($id, array $row)
+    {
+        $this->clearCache();
+    }
+
+    /**
+     * 获取多个模型数据，可在onBeforeDelete事件中调用
+     * @param array|int $id 主键
+     * @return array
+     */
+    protected function getModelList($id): array
+    {
+        $row = $this->getSearchModel([["{$this->alias}.id", 'in', $id]])
+            ->field($this->getSearchFields())
+            ->select()->toArray();
+        empty($row) && $this->error(lang('common.data_not_exist'));
+        return $row;
     }
 
     /**
