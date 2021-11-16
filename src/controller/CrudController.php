@@ -5,6 +5,7 @@ namespace ffhome\frame\controller;
 
 use jianyan\excel\Excel;
 use think\db\BaseQuery;
+use think\facade\Cache;
 use think\facade\Db;
 use think\helper\Str;
 
@@ -21,6 +22,30 @@ abstract class CrudController extends BaseController
      * @var string
      */
     protected $alias;
+
+    /**
+     * 创建者ID的字段名称, false表示没有此功能
+     * @var string|bool
+     */
+    protected $createByField = 'create_by';
+
+    /**
+     * 创建时间字段名称
+     * @var string
+     */
+    protected $createTimeField = 'create_time';
+
+    /**
+     * 修改者ID的字段名称, false表示没有此功能
+     * @var string|bool
+     */
+    protected $updateByField = 'update_by';
+
+    /**
+     * 修改者时间字段名称
+     * @var string|bool
+     */
+    protected $updateTimeField = 'update_time';
 
     /**
      * 软删除的字段名称, false表示没有软删除功能
@@ -292,5 +317,122 @@ abstract class CrudController extends BaseController
     protected function getExportHeader()
     {
         return null;
+    }
+
+    /**
+     * 新增数据操作
+     * @return mixed
+     */
+    public function add()
+    {
+        if ($this->request->isAjax()) {
+            $this->addOperate();
+        }
+        return $this->addPage();
+    }
+
+    /**
+     * 新增数据页面
+     * @return mixed
+     */
+    protected function addPage()
+    {
+        $this->assignConstant();
+        $this->assign('row', $this->setDefaultValueInAddPage([]));
+        return $this->fetch($this->setAddPage());
+    }
+
+    /**
+     * 新增数据页面中，设置数据的默认值，直接向$row数组增加数据即可，如$row['sort']=1000;
+     * @param array $row
+     * @return array
+     */
+    protected function setDefaultValueInAddPage(array $row): array
+    {
+        return $row;
+    }
+
+    /**
+     * 设置新增数据的模板，默认'edit'，即新增与编辑使用同一模板
+     * @return string
+     */
+    protected function setAddPage(): string
+    {
+        return 'edit';
+    }
+
+    /**
+     * 新增数据操作
+     */
+    protected function addOperate()
+    {
+        $data = $this->getAddData();
+        Db::transaction(function () use ($data) {
+            $this->onBeforeAdd($data);
+            $data['id'] = Db::name($this->modelName)->insertGetId($data);
+            $this->onAfterAdd($data);
+        });
+        $this->success(lang('common.save_success'));
+    }
+
+    /**
+     * 数据新增时获取的数据，可以使用$this->request->only(['id','name']);方式获取指定的数据
+     * @return array
+     */
+    protected function getAddData(): array
+    {
+        return $this->request->param();
+    }
+
+    /**
+     * 新增操作前触发的事件，默认处理数据验证功能
+     * @param array $data
+     */
+    protected function onBeforeAdd(array &$data)
+    {
+        //增加创建者与创建时间
+        if ($this->createByField !== false) {
+            $data[$this->createByField] = $data[$this->updateByField] = app('authService')->currentUserId();
+            $data[$this->createTimeField] = $data[$this->updateTimeField] = date('Y-m-d H:i:s');
+        }
+        $rule = $this->validateRuleInAdd($data);
+        $this->validate($data, $rule);
+    }
+
+    /**
+     * 新增时的验证规则，可以通过数据创建不同的规则，也可以直接验证数据抛出异常
+     * @param array $data
+     * @return array
+     */
+    protected function validateRuleInAdd(array $data): array
+    {
+        return $this->validateRule($data);
+    }
+
+    /**
+     * 新增与修改时共同的验证规则，可以通过数据创建不同的规则，也可以直接验证数据抛出异常
+     * @param array $data
+     * @return array
+     */
+    protected function validateRule(array $data): array
+    {
+        return [];
+    }
+
+    /**
+     * 新增操作后触发的事件，默认处理清除模型缓存
+     * @param array $data
+     */
+    protected function onAfterAdd(array &$data)
+    {
+        $this->clearCache();
+    }
+
+    /**
+     * 清除缓存，在数据变化后，会自动调用，默认清除该模型下的所有缓存，可重载清除其他缓存
+     */
+    protected function clearCache()
+    {
+        Cache::tag($this->modelName)->clear();
     }
 }
