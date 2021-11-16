@@ -127,8 +127,8 @@ abstract class CrudController extends BaseController
     protected function indexOperate()
     {
         $param = $this->request->param();
-        $page = isset($param['page']) && !empty($param['page']) ? $param['page'] : 1;
-        $limit = isset($param['limit']) && !empty($param['limit']) ? $param['limit'] : $this->defaultPageSize;
+        $page = isset($param['page']) && !empty($param['page']) ? intval($param['page']) : 1;
+        $limit = isset($param['limit']) && !empty($param['limit']) ? intval($param['limit']) : $this->defaultPageSize;
         $where = $this->buildWhere($param);
         $count = $this->getSearchModel($where)->count();
         $list = $this->getSearchModel($where)
