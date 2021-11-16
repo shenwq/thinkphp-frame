@@ -366,7 +366,12 @@ abstract class CrudController extends BaseController
      */
     protected function addOperate()
     {
-        $data = $this->getAddData();
+        $fields = $this->getAddFilterFields();
+        if (!empty($fields)) {
+            $data = $this->request->only($fields);
+        } else {
+            $data = $this->request->param();
+        }
         Db::transaction(function () use ($data) {
             $this->onBeforeAdd($data);
             $data['id'] = Db::name($this->modelName)->insertGetId($data);
@@ -376,12 +381,21 @@ abstract class CrudController extends BaseController
     }
 
     /**
-     * 数据新增时获取的数据，可以使用$this->request->only(['id','name']);方式获取指定的数据
+     * 新增时的字段数组
      * @return array
      */
-    protected function getAddData(): array
+    protected function getAddFilterFields(): array
     {
-        return $this->request->param();
+        return $this->getFilterFields();
+    }
+
+    /**
+     * 保存时（含新增、修改）的字段数组
+     * @return array
+     */
+    protected function getFilterFields(): array
+    {
+        return [];
     }
 
     /**
