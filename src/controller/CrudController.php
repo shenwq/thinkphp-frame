@@ -390,6 +390,15 @@ abstract class CrudController extends BaseController
     }
 
     /**
+     * 修改时的字段数组
+     * @return array
+     */
+    protected function getEditFilterFields(): array
+    {
+        return $this->getFilterFields();
+    }
+
+    /**
      * 保存时（含新增、修改）的字段数组
      * @return array
      */
@@ -424,6 +433,16 @@ abstract class CrudController extends BaseController
     }
 
     /**
+     * 修改时的验证规则，可以通过数据创建不同的规则，也可以直接验证数据抛出异常
+     * @param array $data
+     * @return array
+     */
+    protected function validateRuleInEdit(array $data): array
+    {
+        return $this->validateRule($data);
+    }
+
+    /**
      * 新增与修改时共同的验证规则，可以通过数据创建不同的规则，也可以直接验证数据抛出异常
      * @param array $data
      * @return array
@@ -438,6 +457,95 @@ abstract class CrudController extends BaseController
      * @param array $data
      */
     protected function onAfterAdd(array &$data)
+    {
+        $this->clearCache();
+    }
+
+    /**
+     * 获取模型数据
+     * @param $id
+     * @return array
+     */
+    protected function getModelInfo(int $id): array
+    {
+        $row = $this->getSearchModel(['id' => $id])
+            ->field($this->getSearchFields())
+            ->find();
+        empty($row) && $this->error(lang('common.data_not_exist'));
+        return $row;
+    }
+
+    /**
+     * 修改数据操作
+     * @param int $id 修改数据的主键
+     * @return mixed
+     */
+    public function edit(int $id)
+    {
+        $row = $this->getModelInfo($id);
+        if ($this->request->isAjax()) {
+            $this->editOperate($row);
+        }
+        return $this->editPage($row);
+    }
+
+    /**
+     * 修改数据页面
+     * @param array $row 数据库的原始数据
+     * @return mixed
+     */
+    protected function editPage(array $row)
+    {
+        $this->assignConstant();
+        $this->assign('row', $row);
+        return $this->fetch();
+    }
+
+    /**
+     * 修改数据操作
+     * @param array $row 数据库的原始数据
+     */
+    protected function editOperate(array $row)
+    {
+        $fields = $this->getEditFilterFields();
+        if (!empty($fields)) {
+            $data = $this->request->only($fields);
+        } else {
+            $data = $this->request->param();
+        }
+        Db::transaction(function () use ($data, $row) {
+            $this->onBeforeEdit($data, $row);
+            Db::name($this->modelName)->update($data);
+            $this->onAfterEdit($data, $row);
+        });
+        $this->success(lang('common.save_success'));
+    }
+
+    /**
+     * 修改操作前触发的事件，默认处理乐观锁，数据验证功能
+     * @param array $data 修改后的数据
+     * @param array $row 数据库原有数据
+     */
+    protected function onBeforeEdit(array &$data, array $row)
+    {
+        if ($this->updateByField !== false) {
+            if (!empty($data[$this->updateTimeField]) && $data[$this->updateTimeField] != $row[$this->updateTimeField]) {
+                $this->error(lang('common.data_overdue'));
+            }
+            //增加修改者与修改时间
+            $data[$this->updateByField] = app('authService')->currentUserId();
+            $data[$this->updateTimeField] = date('Y-m-d H:i:s');
+        }
+        $rule = $this->validateRuleInEdit($data);
+        $this->validate($data, $rule);
+    }
+
+    /**
+     * 修改操作后触发的事件，默认处理清除模型缓存
+     * @param array $data 修改后的数据
+     * @param array $row 数据库原有数据
+     */
+    protected function onAfterEdit(array &$data, array $row)
     {
         $this->clearCache();
     }
