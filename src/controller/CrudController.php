@@ -558,7 +558,11 @@ abstract class CrudController extends BaseController
     {
         Db::transaction(function () use ($id) {
             $row = $this->onBeforeDelete($id);
-            Db::name($this->modelName)->delete($id);
+            if ($this->deleteField === false) {
+                Db::name($this->modelName)->delete($id);
+            } else {
+                Db::name($this->modelName)->whereIn('id', $id)->update([$this->deleteField => date('Y-m-d H:i:s')]);
+            }
             $this->onAfterDelete($id, $row);
         });
         $this->success(lang('common.delete_success'));
