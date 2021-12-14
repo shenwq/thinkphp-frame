@@ -3,7 +3,7 @@ declare (strict_types=1);
 
 namespace ffhome\frame\service;
 
-use think\facade\Cache;
+use ffhome\frame\util\CacheUtil;
 use think\facade\Db;
 
 /**
@@ -21,18 +21,15 @@ class DictDataService
      */
     public function getAll()
     {
-        $cacheName = 'dictDataList';
-        $ret = Cache::get($cacheName);
-        if (empty($ret)) {
+        return CacheUtil::get('dictDataList', function () {
             $ret = [];
             $parentInfo = $this->getByParent(self::P_ROOT);
             foreach ($parentInfo as $p) {
                 $info = $this->getByParent($p['id']);
                 $ret[$p['name']] = $info;
             }
-            Cache::tag(self::NAME)->set($cacheName, $ret);
-        }
-        return $ret;
+            return $ret;
+        }, self::NAME);
     }
 
     private function getByParent($parentId)
@@ -61,18 +58,14 @@ class DictDataService
         if (empty($parentName)) {
             return [];
         }
-        $cacheName = "dictDataListByParentName{$parentName}";
-        $list = Cache::get($cacheName);
-        if (empty($list)) {
-            $list = Db::name(self::NAME)->alias('d')
+        return CacheUtil::get("dictDataListByParentName{$parentName}", function () use ($parentName) {
+            return Db::name(self::NAME)->alias('d')
                 ->leftJoin(self::NAME . ' p', 'd.parent_id=p.id')
                 ->field('d.name,d.value,d.clazz')
                 ->where([['p.name', '=', $parentName], ['d.used', '=', 'Y']])
                 ->order('sort')
                 ->select()
                 ->toArray();
-            Cache::tag(self::NAME)->set($cacheName, $list);
-        }
-        return $list;
+        }, self::NAME);
     }
 }

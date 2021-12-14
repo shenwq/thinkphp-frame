@@ -5,7 +5,7 @@ namespace ffhome\frame\service;
 
 use ffhome\common\util\CommonUtil;
 use ffhome\frame\model\BaseModel;
-use think\facade\Cache;
+use ffhome\frame\util\CacheUtil;
 use think\facade\Db;
 
 /**
@@ -22,15 +22,12 @@ class AclPermissionService
 
     public function getHomeInfo()
     {
-        $data = Cache::get('home_info');
-        if (empty($data)) {
-            $data = Db::name(self::NAME)->field('title,icon,href')
+        return CacheUtil::get('home_info', function () {
+            return Db::name(self::NAME)->field('title,icon,href')
                 ->where('catalog', self::C_HOME)
                 ->where('status', BaseModel::ENABLE)
                 ->find();
-            Cache::tag(self::NAME)->set('home_info', $data);
-        }
-        return $data;
+        }, self::NAME);
     }
 
     public function getMenuTree($userId)

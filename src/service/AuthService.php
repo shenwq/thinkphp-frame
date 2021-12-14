@@ -4,9 +4,9 @@ declare (strict_types=1);
 namespace ffhome\frame\service;
 
 use ffhome\frame\model\BaseModel;
+use ffhome\frame\util\CacheUtil;
 use ffhome\util\JwtAuth;
 use think\db\BaseQuery;
-use think\facade\Cache;
 use think\facade\Db;
 
 /**
@@ -95,8 +95,7 @@ class AuthService
         if (empty($userId)) {
             return [];
         }
-        $perms = Cache::get('auth_code_' . $userId);
-        if (empty($perms)) {
+        return CacheUtil::get('auth_code_' . $userId, function () use ($userId) {
             $perms = Db::name('acl_permission')->alias('p')
                 ->join('acl_role_permission rp', 'rp.permission_id=p.id')
                 ->join('acl_role r', 'r.id=rp.role_id')
@@ -110,17 +109,14 @@ class AuthService
                 ])->column('p.perms');
             //将权限分离并去重
             $perms = array_unique(explode(',', implode(',', $perms)));
-            Cache::tag(self::NAME)->set('auth_code_' . $userId, $perms);
-        }
-        return $perms;
+            return $perms;
+        }, self::NAME);
     }
 
     public function init(): array
     {
-
         $userId = $this->currentUserId();
-        $data = Cache::get('auth_init_' . $userId);
-        if (empty($data)) {
+        return CacheUtil::get('auth_init_' . $userId, function () use ($userId) {
             $config = new SystemConfigService();
             $permission = new AclPermissionService();
             $data = [
@@ -133,8 +129,7 @@ class AuthService
                 'menuInfo' => $permission->getMenuTree($userId),
                 'typeList' => (new DictDataService())->getAll(),
             ];
-            Cache::tag(self::NAME)->set('auth_init_' . $userId, $data);
-        }
-        return $data;
+            return $data;
+        }, self::NAME);
     }
 }
