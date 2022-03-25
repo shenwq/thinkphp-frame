@@ -25,10 +25,12 @@
     "phpunit/phpunit": "^7.0"
   },
   "autoload": {
-    "files": [],
     "psr-4": {
       "ffhome\\frame\\": "src/"
-    }
+    },
+    "files": [
+      "src/helper.php"
+    ]
   },
   "autoload-dev": {
     "psr-4": {
