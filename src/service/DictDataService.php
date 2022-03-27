@@ -63,9 +63,26 @@ class DictDataService
                 ->leftJoin(self::NAME . ' p', 'd.parent_id=p.id')
                 ->field('d.name,d.value,d.clazz')
                 ->where([['p.name', '=', $parentName], ['d.used', '=', 'Y']])
-                ->order('sort')
+                ->order('d.sort')
                 ->select()
                 ->toArray();
         }, self::NAME);
+    }
+
+    /**
+     * 将列表指定的值转成名称
+     * @param string $value
+     * @param string $parentName
+     * @return string
+     */
+    public static function getNameByValue(string $value, string $parentName)
+    {
+        $list = self::getByParentName($parentName);
+        foreach ($list as $vo) {
+            if ($vo['value'] == $value) {
+                return $vo['name'];
+            }
+        }
+        return '';
     }
 }
