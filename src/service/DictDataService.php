@@ -71,11 +71,11 @@ class DictDataService
 
     /**
      * 将列表指定的值转成名称
-     * @param string $value
+     * @param int|string $value
      * @param string $parentName
      * @return string
      */
-    public static function getNameByValue(string $value, string $parentName)
+    public static function getNameByValue($value, string $parentName)
     {
         $list = self::getByParentName($parentName);
         foreach ($list as $vo) {
