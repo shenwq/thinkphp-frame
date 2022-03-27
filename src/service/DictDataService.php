@@ -19,20 +19,20 @@ class DictDataService
      * 取出全部配置信息
      * @return array
      */
-    public function getAll()
+    public static function getAll()
     {
         return CacheUtil::get('dictDataList', function () {
             $ret = [];
-            $parentInfo = $this->getByParent(self::P_ROOT);
+            $parentInfo = self::getByParent(self::P_ROOT);
             foreach ($parentInfo as $p) {
-                $info = $this->getByParent($p['id']);
+                $info = self::getByParent($p['id']);
                 $ret[$p['name']] = $info;
             }
             return $ret;
         }, self::NAME);
     }
 
-    private function getByParent($parentId)
+    private static function getByParent($parentId)
     {
         if ($parentId == self::P_ROOT) {
             $field = 'id,name';
@@ -53,7 +53,7 @@ class DictDataService
      * @param string $parentName
      * @return array
      */
-    public function getByParentName(string $parentName)
+    public static function getByParentName(string $parentName)
     {
         if (empty($parentName)) {
             return [];

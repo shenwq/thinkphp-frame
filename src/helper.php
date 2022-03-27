@@ -47,7 +47,7 @@ if (!function_exists('sysConfig')) {
      */
     function sysConfig(string $category, string $name = null)
     {
-        return (new SystemConfigService())->config($category, $name);
+        return SystemConfigService::config($category, $name);
     }
 
     /**

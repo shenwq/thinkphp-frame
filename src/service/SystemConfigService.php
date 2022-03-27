@@ -19,7 +19,7 @@ class SystemConfigService
      * @param string|null $name
      * @return array|string
      */
-    public function config(string $category, string $name = null)
+    public static function config(string $category, string $name = null)
     {
         $key = self::NAME;
         $value = empty($name) ? Cache::get("{$key}_{$category}") : Cache::get("{$key}__{$name}");
@@ -41,8 +41,8 @@ class SystemConfigService
      * @param string $name
      * @return string
      */
-    public function value(string $name): string
+    public static function value(string $name): string
     {
-        return $this->config('', $name);
+        return self::config('', $name);
     }
 }

@@ -20,7 +20,7 @@ class AclPermissionService
 
     const NAME = 'acl_permission';
 
-    public function getHomeInfo()
+    public static function getHomeInfo()
     {
         return CacheUtil::get('home_info', function () {
             return Db::name(self::NAME)->field('title,icon,href')
@@ -30,7 +30,7 @@ class AclPermissionService
         }, self::NAME);
     }
 
-    public function getMenuTree($userId)
+    public static function getMenuTree($userId)
     {
         if (empty($userId)) {
             return [];

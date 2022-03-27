@@ -28,7 +28,7 @@ class AuthService
         if (empty($userId)) {
             $token = cookie('token');
             if (!empty($token)) {
-                $userId = JwtAuth::verifyToken($token, (new SystemConfigService())->value('token_key'));
+                $userId = JwtAuth::verifyToken($token, SystemConfigService::value('token_key'));
                 if (!empty($userId)) {
                     $userId = $userId['id'];
                     $user = $this->getUserById($userId);
@@ -117,17 +117,15 @@ class AuthService
     {
         $userId = $this->currentUserId();
         return CacheUtil::get('auth_init_' . $userId, function () use ($userId) {
-            $config = new SystemConfigService();
-            $permission = new AclPermissionService();
             $data = [
                 'logoInfo' => [
-                    'title' => $config->value('logo_title'),
-                    'image' => $config->value('logo_image'),
+                    'title' => SystemConfigService::value('logo_title'),
+                    'image' => SystemConfigService::value('logo_image'),
                     'href' => url('index/index')->build(),
                 ],
-                'homeInfo' => $permission->getHomeInfo(),
-                'menuInfo' => $permission->getMenuTree($userId),
-                'typeList' => (new DictDataService())->getAll(),
+                'homeInfo' => AclPermissionService::getHomeInfo(),
+                'menuInfo' => AclPermissionService::getMenuTree($userId),
+                'typeList' => DictDataService::getAll(),
             ];
             return $data;
         }, self::NAME);
