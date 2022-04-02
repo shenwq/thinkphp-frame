@@ -19,7 +19,7 @@
     "jianyan74/php-excel": "^1.0",
     "ffhome/jwt-auth": "^1.0",
     "ffhome/thinkphp-upload": "^1.0",
-    "ffhome/php-common": "^1.1"
+    "ffhome/php-common": "^1.3.5"
   },
   "require-dev": {
     "phpunit/phpunit": "^7.0"
