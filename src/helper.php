@@ -6,39 +6,6 @@ use ffhome\frame\service\AuthService;
 use ffhome\frame\service\SystemConfigService;
 use think\facade\Db;
 
-if (!function_exists('currentUrl')) {
-    /**
-     * 当前URL
-     * @return string
-     */
-    function currentUrl(): string
-    {
-        return \ffhome\common\util\CommonUtil::getUrl();
-    }
-}
-
-if (!function_exists('isWeixin')) {
-    /**
-     * 是否是Weixin浏览器
-     * @return bool
-     */
-    function isWeixin(): bool
-    {
-        return \ffhome\common\util\CommonUtil::isWeixin();
-    }
-}
-
-if (!function_exists('isMobile')) {
-    /**
-     * 是否是手机
-     * @return bool
-     */
-    function isMobile(): bool
-    {
-        return \ffhome\common\util\CommonUtil::isMobile();
-    }
-}
-
 if (!function_exists('__url')) {
     /**
      * 构建URL地址
