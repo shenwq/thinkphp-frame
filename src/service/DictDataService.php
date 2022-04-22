@@ -50,18 +50,19 @@ class DictDataService
 
     /**
      * 按名称取出配置信息
-     * @param string $parentName
+     * @param string $parentName 列表名称
+     * @param string $field 查询字段
      * @return array
      */
-    public static function getByParentName(string $parentName)
+    public static function getByParentName(string $parentName, string $field = 'd.name,d.value,d.clazz')
     {
         if (empty($parentName)) {
             return [];
         }
-        return CacheUtil::get("dictDataListByParentName{$parentName}", function () use ($parentName) {
+        return CacheUtil::get("dictDataListByParentName{$parentName}_{$field}", function () use ($parentName, $field) {
             return Db::name(self::NAME)->alias('d')
                 ->leftJoin(self::NAME . ' p', 'd.parent_id=p.id')
-                ->field('d.name,d.value,d.clazz')
+                ->field($field)
                 ->where([['p.name', '=', $parentName], ['d.used', '=', 'Y']])
                 ->order('d.sort')
                 ->select()
