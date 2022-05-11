@@ -119,6 +119,21 @@ trait JumpTrait
     }
 
     /**
+     * 返回封装后的 json 数据到客户端
+     * @access protected
+     * @param mixed $data 要返回的数据
+     * @param mixed $msg 提示信息
+     * @param int $code 返回的 code
+     * @param array $header 发送的 Header 信息
+     * @return void
+     * @throws HttpResponseException
+     */
+    protected function json_result($data, $msg = '', int $code = 0, array $header = [])
+    {
+        $this->result($data, $code, $msg, 'json', $header);
+    }
+
+    /**
      * URL 重定向
      * @access protected
      * @param string $url 跳转的 URL 表达式
