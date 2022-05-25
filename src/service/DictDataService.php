@@ -17,32 +17,34 @@ class DictDataService
 
     /**
      * 取出全部配置信息
+     * @param array $where 查找根节点条件
+     * @param string $field 列表的字段信息
      * @return array
      */
-    public static function getAll()
+    public static function getAll($where = [], string $field = 'name,value,clazz')
     {
-        return CacheUtil::get('dictDataList', function () {
+        return CacheUtil::get('dictDataList_' . json_encode($where) . '_' . $field, function () use ($where, $field) {
             $ret = [];
-            $parentInfo = self::getByParent(self::P_ROOT);
+            $parentInfo = self::getByParent(self::P_ROOT, '', $where);
             foreach ($parentInfo as $p) {
-                $info = self::getByParent($p['id']);
+                $info = self::getByParent($p['id'], $field);
                 $ret[$p['name']] = $info;
             }
             return $ret;
         }, self::NAME);
     }
 
-    private static function getByParent($parentId)
+    private static function getByParent($parentId, string $field = 'name,value,clazz', $where = [])
     {
         if ($parentId == self::P_ROOT) {
             $field = 'id,name';
-        } else {
-            $field = 'name,value,clazz';
         }
 
+        $w = [['parent_id', '=', $parentId], ['used', '=', 'Y']];
+        $where = array_merge($w, $where);
         return Db::name(self::NAME)
             ->field($field)
-            ->where([['parent_id', '=', $parentId], ['used', '=', 'Y']])
+            ->where($where)
             ->order('sort')
             ->select()
             ->toArray();
