@@ -3,6 +3,7 @@ declare (strict_types=1);
 
 use ffhome\frame\model\BaseModel;
 use ffhome\frame\service\AuthService;
+use ffhome\frame\service\DictDataService;
 use ffhome\frame\service\SystemConfigService;
 use think\facade\Db;
 
@@ -57,6 +58,19 @@ if (!function_exists('sysConfig')) {
     function sysValue(string $name): string
     {
         return sysConfig('', $name);
+    }
+}
+
+if (!function_exists('dictList')) {
+    /**
+     * 获得指定的数据列表
+     * @param string $parentName
+     * @param string $field
+     * @return array
+     */
+    function dictList(string $parentName, string $field = 'd.name,d.value,d.clazz')
+    {
+        return DictDataService::getByParentName($parentName, $field);
     }
 }
 
