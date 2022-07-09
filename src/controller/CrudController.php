@@ -420,6 +420,7 @@ abstract class CrudController extends BaseController
             $data[$this->createByField] = $data[$this->updateByField] = app('authService')->currentUserId();
             $data[$this->createTimeField] = $data[$this->updateTimeField] = date('Y-m-d H:i:s');
         }
+        $this->onBeforeSave($data);
         $rule = $this->validateRuleInAdd($data);
         $this->validate($data, $rule);
     }
@@ -460,7 +461,7 @@ abstract class CrudController extends BaseController
      */
     protected function onAfterAdd(array &$data)
     {
-        $this->clearCache();
+        $this->onAfterSave($data);
     }
 
     /**
@@ -538,6 +539,7 @@ abstract class CrudController extends BaseController
             $data[$this->updateByField] = app('authService')->currentUserId();
             $data[$this->updateTimeField] = date('Y-m-d H:i:s');
         }
+        $this->onBeforeSave($data, $row);
         $rule = $this->validateRuleInEdit($data);
         $this->validate($data, $rule);
     }
@@ -548,6 +550,15 @@ abstract class CrudController extends BaseController
      * @param array $row 数据库原有数据
      */
     protected function onAfterEdit(array &$data, array $row)
+    {
+        $this->onAfterSave($data, $row);
+    }
+
+    protected function onBeforeSave(array &$data, array $row = [])
+    {
+    }
+
+    protected function onAfterSave(array &$data, array $row = [])
     {
         $this->clearCache();
     }
