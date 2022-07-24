@@ -93,7 +93,7 @@ CREATE TABLE `{$this->tableName}` (
   `ip` varchar(50) NOT NULL DEFAULT '' COMMENT 'IP',
   `user_id` bigint unsigned NOT NULL DEFAULT 0 COMMENT '人员ID',
   `content` text NOT NULL COMMENT '内容',
-  `useragent` varchar(255) DEFAULT '' COMMENT 'User-Agent',
+  `useragent` varchar(500) DEFAULT '' COMMENT 'User-Agent',
   PRIMARY KEY (`id`)
 ) COMMENT='后台操作日志表 - {$this->tableSuffix}';
 EOT;
