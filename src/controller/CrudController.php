@@ -379,7 +379,17 @@ abstract class CrudController extends BaseController
             $data['id'] = Db::name($this->modelName)->insertGetId($data);
             $this->onAfterAdd($data);
         });
-        $this->success(lang('common.save_success'));
+        $this->success($this->getAddSuccessInfo($data));
+    }
+
+    /**
+     * 新增成功的信息
+     * @param $data
+     * @return string
+     */
+    protected function getAddSuccessInfo($data): string
+    {
+        return lang('common.save_success');
     }
 
     /**
@@ -521,7 +531,17 @@ abstract class CrudController extends BaseController
             Db::name($this->modelName)->update($data);
             $this->onAfterEdit($data, $row);
         });
-        $this->success(lang('common.save_success'));
+        $this->success($this->getEditSuccessInfo($data));
+    }
+
+    /**
+     * 修改成功的信息
+     * @param $data
+     * @return string
+     */
+    protected function getEditSuccessInfo($data): string
+    {
+        return lang('common.save_success');
     }
 
     /**
@@ -578,7 +598,17 @@ abstract class CrudController extends BaseController
             }
             $this->onAfterDelete($id, $row);
         });
-        $this->success(lang('common.delete_success'));
+        $this->success($this->getDeleteSuccessInfo($id));
+    }
+
+    /**
+     * 删除成功的信息
+     * @param $id
+     * @return string
+     */
+    protected function getDeleteSuccessInfo($id): string
+    {
+        return lang('common.delete_success');
     }
 
     /**
