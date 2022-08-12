@@ -427,8 +427,12 @@ abstract class CrudController extends BaseController
     {
         //增加创建者与创建时间
         if ($this->createByField !== false) {
-            $data[$this->createByField] = $data[$this->updateByField] = app('authService')->currentUserId();
-            $data[$this->createTimeField] = $data[$this->updateTimeField] = date('Y-m-d H:i:s');
+            $data[$this->createByField] = app('authService')->currentUserId();
+            $data[$this->createTimeField] = date('Y-m-d H:i:s');
+        }
+        if ($this->updateByField !== false) {
+            $data[$this->updateByField] = app('authService')->currentUserId();
+            $data[$this->updateTimeField] = date('Y-m-d H:i:s');
         }
         $this->onBeforeSave($data);
         $rule = $this->validateRuleInAdd($data);
