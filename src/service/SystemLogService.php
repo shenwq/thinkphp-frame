@@ -87,7 +87,7 @@ class SystemLogService
 CREATE TABLE `{$this->tableName}` (
   `id` bigint unsigned NOT NULL AUTO_INCREMENT COMMENT '主键',
   `fingerprint` varchar(32) NOT NULL DEFAULT '' COMMENT '浏览器指纹',
-  `create_time` datetime NOT NULL DEFAULT '2000-01-01 00:00:00' COMMENT '操作时间',
+  `create_time` datetime NOT NULL DEFAULT '1900-01-01 00:00:00' COMMENT '操作时间',
   `url` varchar(1500) NOT NULL DEFAULT '' COMMENT '操作页面',
   `method` varchar(50) NOT NULL COMMENT '请求方法',
   `ip` varchar(50) NOT NULL DEFAULT '' COMMENT 'IP',
