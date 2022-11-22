@@ -96,6 +96,17 @@ if (!function_exists('currentUserId')) {
     }
 }
 
+if (!function_exists('currentUser')) {
+    /**
+     * 当前人员
+     * @return array
+     */
+    function currentUser(): array
+    {
+        return authService()->currentUser();
+    }
+}
+
 if (!function_exists('auth')) {
     /**
      * auth权限验证

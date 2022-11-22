@@ -43,6 +43,21 @@ class AuthService
         return $userId;
     }
 
+    /**
+     * 当前用户信息
+     * @return array
+     */
+    public function currentUser(): array
+    {
+        $user = session(config('app.sess_user'));
+        if (empty($user)) {
+            $this->currentUserId();
+            $user = session(config('app.sess_user'));
+            if (empty($user)) $user = [];
+        }
+        return $user;
+    }
+
     public function addInfoToSession(array &$info)
     {
     }
