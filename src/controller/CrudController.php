@@ -156,11 +156,15 @@ abstract class CrudController extends BaseController
         $limit = isset($param['limit']) && !empty($param['limit']) ? intval($param['limit']) : $this->defaultPageSize;
         $where = $this->buildWhere($param);
         $count = $this->getSearchModel($where)->count();
-        $list = $this->getSearchModel($where)
-            ->page($page, $limit)
-            ->field($this->getSearchFields())
-            ->order($this->getSearchSort())
-            ->select()->toArray();
+        if ($count == 0) {
+            $list = [];
+        } else {
+            $list = $this->getSearchModel($where)
+                ->page($page, $limit)
+                ->field($this->getSearchFields())
+                ->order($this->getSearchSort())
+                ->select()->toArray();
+        }
         return $this->successPage($count, $list);
     }
 
