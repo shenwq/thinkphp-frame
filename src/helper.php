@@ -126,7 +126,7 @@ if (!function_exists('roleList')) {
      */
     function roleList(): array
     {
-        return Db::name('acl_role')
+        return Db::name(ffhome\frame\model\AclRole::MODEL_NAME)
             ->where('status', BaseModel::ENABLE)
             ->where('type', BaseModel::ENABLE)
             ->order('sort')

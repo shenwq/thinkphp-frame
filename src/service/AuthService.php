@@ -3,6 +3,11 @@ declare (strict_types=1);
 
 namespace ffhome\frame\service;
 
+use ffhome\frame\model\AclPermission;
+use ffhome\frame\model\AclRole;
+use ffhome\frame\model\AclRolePermission;
+use ffhome\frame\model\AclUser;
+use ffhome\frame\model\AclUserRole;
 use ffhome\frame\model\BaseModel;
 use ffhome\frame\util\CacheUtil;
 use ffhome\util\JwtAuth;
@@ -64,7 +69,7 @@ class AuthService
 
     private function getUserDb(): BaseQuery
     {
-        return Db::name('acl_user')->alias('u');
+        return Db::name(AclUser::MODEL_NAME)->alias('u');
     }
 
     public function getUserByUserName(string $username)
@@ -111,10 +116,10 @@ class AuthService
             return [];
         }
         return CacheUtil::get('auth_code_' . $userId, function () use ($userId) {
-            $perms = Db::name('acl_permission')->alias('p')
-                ->join('acl_role_permission rp', 'rp.permission_id=p.id')
-                ->join('acl_role r', 'r.id=rp.role_id')
-                ->join('acl_user_role ur', 'ur.role_id=r.id')
+            $perms = Db::name(AclPermission::MODEL_NAME)->alias('p')
+                ->join(AclRolePermission::MODEL_NAME . ' rp', 'rp.permission_id=p.id')
+                ->join(AclRole::MODEL_NAME . ' r', 'r.id=rp.role_id')
+                ->join(AclUserRole::MODEL_NAME . ' ur', 'ur.role_id=r.id')
                 ->distinct(true)->field('p.perms')
                 ->where([
                     ['ur.user_id', '=', $userId],
