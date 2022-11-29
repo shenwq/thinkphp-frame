@@ -45,4 +45,17 @@ class SystemConfigService
     {
         return self::config('', $name);
     }
+
+    /**
+     * 修改配置档信息，只更新自己的缓存，不会更新组的缓存
+     * @param string $name
+     * @param $value
+     * @throws \think\db\exception\DbException
+     */
+    public static function setValue(string $name, $value)
+    {
+        $key = self::NAME;
+        Db::name($key)->where('name', $name)->update(['value' => $value]);
+        Cache::tag($key)->set("{$key}__{$name}", $value);
+    }
 }
