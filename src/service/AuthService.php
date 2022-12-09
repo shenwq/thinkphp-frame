@@ -75,7 +75,7 @@ class AuthService
     public function getUserByUserName(string $username)
     {
         return $this->getUserDb()
-            ->field($this->sessionField . ',u.password,u.login_num')
+            ->field($this->sessionField . ',u.password')
             ->where(['u.username' => $username, 'u.status' => BaseModel::ENABLE])
             ->whereNull('u.delete_time')
             ->find();
