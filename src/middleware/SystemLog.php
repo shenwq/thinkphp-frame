@@ -38,7 +38,7 @@ class SystemLog
                     in_array($key, $this->sensitiveParams) && $params[$key] = CommonUtil::password($val);
                 }
                 $data = [
-                    'user_id' => app('authService')->currentUserId(),
+                    'user_id' => authService()->currentUserId(),
                     'url' => $url,
                     'method' => $method,
                     'ip' => $ip,
