@@ -142,7 +142,7 @@ abstract class CrudController extends BaseController
     protected function indexPage($param)
     {
         $this->assign('param', $param);
-        return $this->fetch();
+        return $this->fetch($this->setIndexPage());
     }
 
     /**
@@ -365,12 +365,30 @@ abstract class CrudController extends BaseController
     }
 
     /**
+     * 设置列表数据的模板
+     * @return string
+     */
+    protected function setIndexPage(): string
+    {
+        return '';
+    }
+
+    /**
      * 设置新增数据的模板，默认'edit'，即新增与编辑使用同一模板
      * @return string
      */
     protected function setAddPage(): string
     {
         return 'edit';
+    }
+
+    /**
+     * 设置修改数据的模板
+     * @return string
+     */
+    protected function setEditPage(): string
+    {
+        return '';
     }
 
     /**
@@ -525,7 +543,7 @@ abstract class CrudController extends BaseController
     {
         $this->assignConstant();
         $this->assign('row', $row);
-        return $this->fetch();
+        return $this->fetch($this->setEditPage());
     }
 
     /**
