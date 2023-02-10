@@ -1,11 +1,24 @@
 <?php
 declare (strict_types=1);
 
+use ffhome\common\util\CommonUtil;
 use ffhome\frame\model\BaseModel;
 use ffhome\frame\service\AuthService;
 use ffhome\frame\service\DictDataService;
 use ffhome\frame\service\SystemConfigService;
 use think\facade\Db;
+
+if (!function_exists('sync')) {
+    /**
+     * 同步函数
+     * @param string|int $key 同步的Key值
+     * @param Closure $fn 需同步的方法
+     */
+    function sync($key, \Closure $fn): void
+    {
+        CommonUtil::sync(runtime_path() . $key . '.txt', $fn);
+    }
+}
 
 if (!function_exists('__url')) {
     /**
