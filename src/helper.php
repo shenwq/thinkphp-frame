@@ -13,10 +13,11 @@ if (!function_exists('sync')) {
      * 同步函数
      * @param string|int $key 同步的Key值
      * @param Closure $fn 需同步的方法
+     * @return mixed|null 返回方法的返回值
      */
-    function sync($key, \Closure $fn): void
+    function sync($key, \Closure $fn)
     {
-        CommonUtil::sync(runtime_path() . $key . '.txt', $fn);
+        return CommonUtil::sync(runtime_path() . $key . '.txt', $fn);
     }
 }
 
