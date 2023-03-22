@@ -17,7 +17,11 @@ if (!function_exists('sync')) {
      */
     function sync($key, \Closure $fn)
     {
-        return CommonUtil::sync(runtime_path() . $key . '.txt', $fn);
+        $path = root_path('runtime' . DIRECTORY_SEPARATOR . 'sync');
+        if (!is_dir($path)) {
+            mkdir($path, 0777, true);
+        }
+        return CommonUtil::sync($path . $key . '.sync', $fn);
     }
 }
 
