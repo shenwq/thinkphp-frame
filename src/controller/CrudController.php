@@ -3,6 +3,7 @@ declare (strict_types=1);
 
 namespace ffhome\frame\controller;
 
+use ffhome\frame\service\SystemDeleteService;
 use jianyan\excel\Excel;
 use think\db\BaseQuery;
 use think\facade\Cache;
@@ -52,6 +53,12 @@ abstract class CrudController extends BaseController
      * @var string|bool
      */
     protected $deleteField = false;
+
+    /**
+     * 删除时记录到日志表中
+     * @var bool
+     */
+    protected $recordDelete = false;
 
     /**
      * 模板布局, false取消
@@ -650,7 +657,22 @@ abstract class CrudController extends BaseController
      */
     protected function onBeforeDelete($id): array
     {
-        return [];
+        $row = [];
+        if ($this->recordDelete) {
+            $recordService = new SystemDeleteService();
+            $data = [
+                'user_id' => app('authService')->currentUserId(),
+                'create_time' => date('Y-m-d H:i:s'),
+                'table_name' => $this->modelName,
+            ];
+            $row = Db::name($this->modelName)->whereIn('id', $id)->select()->toArray();
+            foreach ($row as $vo) {
+                $data['outer_id'] = $vo['id'];
+                $data['content'] = json_encode($vo, JSON_UNESCAPED_UNICODE);
+                $recordService->save($data);
+            }
+        }
+        return $row;
     }
 
     /**
