@@ -58,7 +58,7 @@ abstract class CrudController extends BaseController
      * 删除时记录到日志表中
      * @var bool
      */
-    protected $recordDelete = false;
+    protected $recordDelete = true;
 
     /**
      * 模板布局, false取消
@@ -659,18 +659,8 @@ abstract class CrudController extends BaseController
     {
         $row = [];
         if ($this->recordDelete) {
-            $recordService = new SystemDeleteService();
-            $data = [
-                'user_id' => app('authService')->currentUserId(),
-                'create_time' => date('Y-m-d H:i:s'),
-                'table_name' => $this->modelName,
-            ];
             $row = Db::name($this->modelName)->whereIn('id', $id)->select()->toArray();
-            foreach ($row as $vo) {
-                $data['outer_id'] = $vo['id'];
-                $data['content'] = json_encode($vo, JSON_UNESCAPED_UNICODE);
-                $recordService->save($data);
-            }
+            (new SystemDeleteService())->saveRecords($row, $this->modelName);
         }
         return $row;
     }

@@ -40,6 +40,38 @@ class SystemDeleteService
         return $this;
     }
 
+    /**
+     * 保存删除记录
+     * @param $list 多个删除记录
+     * @param $tableName 表名
+     * @param $userId 当前用户ID
+     */
+    public function saveRecords($list, $tableName, $userId = '')
+    {
+        if (empty($userId)) {
+            $userId = app('authService')->currentUserId();
+        }
+        $data = [
+            'user_id' => $userId,
+            'create_time' => date('Y-m-d H:i:s'),
+            'table_name' => $tableName,
+        ];
+        foreach ($list as $vo) {
+            $data['outer_id'] = $vo['id'];
+            $data['content'] = json_encode($vo, JSON_UNESCAPED_UNICODE);
+            $this->save($data);
+        }
+    }
+
+    /**
+     * @param $vo 单个删除记录
+     * @param $tableName 表名
+     * @param $userId 当前用户ID
+     */
+    public function saveRecord($vo, $tableName, $userId = '')
+    {
+        $this->saveRecords([$vo], $tableName, $userId);
+    }
 
     /**
      * 保存数据
