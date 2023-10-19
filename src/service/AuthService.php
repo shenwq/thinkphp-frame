@@ -21,7 +21,7 @@ use think\facade\Db;
 class AuthService
 {
     const NAME = 'authority';
-    protected $sessionField = 'u.id,u.username,u.nick_name,u.avatar';
+    protected $sessionField = 'u.id,u.username,u.nickname,u.avatar';
 
     /**
      * 当前用户ID

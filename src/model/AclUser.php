@@ -21,7 +21,7 @@ class AclUser extends BaseModel
                     ['u.delete_time', 'exp', Db::raw('is null')],
                 ])
                 ->order(['id' => 'desc'])
-                ->column('u.nick_name', 'u.id');
+                ->column('u.nickname', 'u.id');
         }, self::MODEL_NAME);
     }
 }
