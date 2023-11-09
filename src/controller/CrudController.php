@@ -325,6 +325,7 @@ abstract class CrudController extends BaseController
             ->order($this->getSearchSort())
             ->select()->toArray();
         $fileName = date('YmdHis');
+        $this->convertExportData($list);
         return Excel::exportData($list, $header, $fileName, 'xlsx');
     }
 
@@ -336,6 +337,10 @@ abstract class CrudController extends BaseController
     protected function getExportHeader()
     {
         return null;
+    }
+
+    protected function convertExportData(&$list)
+    {
     }
 
     /**
