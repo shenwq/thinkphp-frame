@@ -726,7 +726,7 @@ abstract class CrudController extends BaseController
         // 清除之前的错误输出
         ob_end_clean();
         ob_start();
-        !$filename && $filename = time();
+        !$filename && $filename = date('YmdHis');
         // 直接输出下载
         switch ($suffix) {
             case 'xlsx' :
