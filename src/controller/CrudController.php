@@ -5,6 +5,11 @@ namespace ffhome\frame\controller;
 
 use ffhome\frame\service\SystemDeleteService;
 use jianyan\excel\Excel;
+use PhpOffice\PhpSpreadsheet\Spreadsheet;
+use PhpOffice\PhpSpreadsheet\Writer\Csv;
+use PhpOffice\PhpSpreadsheet\Writer\Html;
+use PhpOffice\PhpSpreadsheet\Writer\Xls;
+use PhpOffice\PhpSpreadsheet\Writer\Xlsx;
 use think\db\BaseQuery;
 use think\facade\Cache;
 use think\facade\Db;
@@ -700,5 +705,76 @@ abstract class CrudController extends BaseController
     protected function clearCache()
     {
         Cache::tag($this->modelName)->clear();
+    }
+
+    /**
+     * 导出Excel
+     * @param Spreadsheet $spreadsheet
+     * @param string $filename
+     * @param string $suffix
+     * @param string $path
+     * @return bool
+     * @throws \PhpOffice\PhpSpreadsheet\Writer\Exception
+     */
+    protected static function exportExcel(
+        Spreadsheet $spreadsheet,
+        string $filename = '',
+        string $suffix = 'xlsx',
+        string $path = ''
+    )
+    {
+        // 清除之前的错误输出
+        ob_end_clean();
+        ob_start();
+        !$filename && $filename = time();
+        // 直接输出下载
+        switch ($suffix) {
+            case 'xlsx' :
+                $writer = new Xlsx($spreadsheet);
+                if (!empty($path)) {
+                    $writer->save($path);
+                } else {
+                    header("Content-Type: application/vnd.openxmlformats-officedocument.spreadsheetml.sheet;charset=utf-8;");
+                    header("Content-Disposition: inline;filename=\"{$filename}.xlsx\"");
+                    header('Cache-Control: max-age=0');
+                    $writer->save('php://output');
+                }
+                exit();
+            case 'xls' :
+                $writer = new Xls($spreadsheet);
+                if (!empty($path)) {
+                    $writer->save($path);
+                } else {
+                    header("Content-Type:application/vnd.ms-excel;charset=utf-8;");
+                    header("Content-Disposition:inline;filename=\"{$filename}.xls\"");
+                    header('Cache-Control: max-age=0');
+                    $writer->save('php://output');
+                }
+                exit();
+            case 'csv' :
+                $writer = new Csv($spreadsheet);
+                if (!empty($path)) {
+                    $writer->save($path);
+                } else {
+                    header("Content-type:text/csv;charset=utf-8;");
+                    header("Content-Disposition:attachment; filename={$filename}.csv");
+                    header('Cache-Control: max-age=0');
+                    $writer->save('php://output');
+                }
+                exit();
+            case 'html' :
+                $writer = new Html($spreadsheet);
+                if (!empty($path)) {
+                    $writer->save($path);
+                } else {
+                    header("Content-Type:text/html;charset=utf-8;");
+                    header("Content-Disposition:attachment;filename=\"{$filename}.{$suffix}\"");
+                    header('Cache-Control: max-age=0');
+                    $writer->save('php://output');
+                }
+                exit();
+        }
+
+        return true;
     }
 }
